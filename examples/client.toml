@@ -1,0 +1,47 @@
+# RustGuard Example Client Configuration
+# Copy to /etc/rustguard/client.toml and set permissions: chmod 600
+
+[interface]
+# Your private key (generate with: rustguard-client genkey)
+private_key = "GAFt9KSPFGYN9lnZeiT15jeuyJsTdtVke6hyi51p1ng="
+
+# Your tunnel IP address
+address = "10.0.0.2/24"
+
+# DNS servers to use through the tunnel
+dns = ["10.0.0.1"]
+
+# MTU (default 1420, suitable for most networks)
+mtu = 1420
+
+[[peer]]
+# Server's public key
+public_key = "AbnxgYsA0rEvPJ/oL94W9HR/XLq/OO6RtlG0x3t5SWI="
+
+# Server endpoint
+endpoint = "192.0.2.1:51820"
+
+# Route all IPv4 traffic through the tunnel. IPv6 is deliberately rejected in
+# the current safe-networking milestone.
+allowed_ips = ["0.0.0.0/0"]
+
+# Keep the connection alive (helps with NAT)
+persistent_keepalive = 25
+
+[client]
+# Enable kill switch (blocks traffic if tunnel drops)
+kill_switch = true
+
+# Force DNS through the tunnel
+dns_leak_prevention = true
+
+# Permit common private/link-local IPv4 destinations outside the tunnel.
+# Keep false for fail-closed behavior.
+allow_lan = false
+
+[logging]
+# Log level: off, error, warn, info, debug, trace
+level = "info"
+
+# Write debug logs to /tmp (ephemeral, auto-deleted on clean shutdown)
+debug_to_file = false

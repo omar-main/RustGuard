@@ -1,0 +1,59 @@
+[workspace]
+resolver = "2"
+members = [
+    "rustguard-core",
+    "rustguard-tun",
+    "rustguard-client",
+    "rustguard-server",
+]
+
+[workspace.package]
+version = "0.1.0-rc.1"
+edition = "2021"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/omar-main/RustGuard"
+rust-version = "1.85"
+
+[workspace.dependencies]
+# WireGuard protocol engine
+boringtun = "0.7.1"
+
+# Async runtime
+tokio = { version = "1", features = ["full"] }
+
+# Configuration
+toml = "0.8"
+serde = { version = "1", features = ["derive"] }
+
+# Logging
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+# Security
+zeroize = { version = "1", features = ["derive"] }
+
+# Linux system calls
+nix = { version = "0.31.3", features = ["net", "ioctl", "fs"] }
+libc = "0.2"
+
+# Networking
+ipnet = { version = "2", features = ["serde"] }
+
+# CLI
+clap = { version = "4", features = ["derive"] }
+
+# Error handling
+thiserror = "1"
+anyhow = "1"
+
+# Recovery journal
+serde_json = "1"
+
+# Base64 for key encoding
+base64 = "0.22"
+
+# Random number generation
+getrandom = "0.2"
+
+# X25519 key derivation (must match boringtun's pinned version)
+x25519-dalek = { version = "2.0.1", features = ["static_secrets"] }

@@ -1,0 +1,27 @@
+[package]
+name = "rustguard-server"
+description = "RustGuard VPN server binary"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[[bin]]
+name = "rustguard-server"
+path = "src/main.rs"
+
+[dependencies]
+rustguard-core = { path = "../rustguard-core", version = "0.1.0-rc.1" }
+rustguard-tun = { path = "../rustguard-tun", version = "0.1.0-rc.1" }
+tokio.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true
+clap.workspace = true
+anyhow.workspace = true
+base64.workspace = true
+getrandom.workspace = true
+x25519-dalek.workspace = true
+ipnet.workspace = true
+
+[dev-dependencies]
+tokio = { workspace = true, features = ["test-util", "macros"] }

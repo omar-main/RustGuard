@@ -1,0 +1,58 @@
+# RustGuard Example Server Configuration
+# Copy to /etc/rustguard/server.toml and set permissions: chmod 600
+
+[interface]
+# Your private key (generate with: rustguard-server genkey)
+private_key = "OKV2UmaU7IcFW/yD3OSss+zHXSC0siWufMnXM2ZeGng="
+
+# Server's tunnel IP address
+address = "10.0.0.1/24"
+
+# Port to listen on
+listen_port = 51820
+
+# MTU (default 1420)
+mtu = 1420
+
+[server]
+# Enable these only after configuring the corresponding host prerequisites.
+require_forwarding = false
+require_nat = false
+
+[[peer]]
+# Stable diagnostic label
+name = "laptop"
+
+# Client's public key
+public_key = "4pJkDwxLgHYbeNCAPABufVvmbyFLB1+fn/MWhAXDnXE="
+
+# Client's allowed IP (assign a specific IP to this client)
+allowed_ips = ["10.0.0.2/32"]
+
+# No endpoint needed - client initiates connection
+
+[logging]
+# Log level: off, error, warn, info, debug, trace
+level = "info"
+
+# Write debug logs to /tmp (ephemeral, auto-deleted on clean shutdown)
+debug_to_file = false
+
+# =============================================================================
+# SERVER SETUP NOTES (Linux)
+# =============================================================================
+#
+# 1. Enable IP forwarding:
+#    echo 1 > /proc/sys/net/ipv4/ip_forward
+#    # Or permanently: add "net.ipv4.ip_forward=1" to /etc/sysctl.conf
+#
+# 2. Set up NAT masquerade (replace eth0 with your internet interface):
+#    nft add table nat
+#    nft add chain nat postrouting { type nat hook postrouting priority 100 \; }
+#    nft add rule nat postrouting oifname "eth0" masquerade
+#
+# 3. Allow UDP traffic on the listen port:
+#    nft add rule inet filter input udp dport 51820 accept
+#
+# 4. Run the server:
+#    sudo rustguard-server -c /etc/rustguard/server.toml start

@@ -1,0 +1,31 @@
+# Build artifacts
+/target/
+
+# Cargo lock is included for reproducibility
+# Cargo.lock
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Test artifacts
+*.key
+
+# Coverage
+*.profraw
+*.profdata
+coverage/
+/dist/
+
+# Personal project coordination
+agent.md
+roadmap.md

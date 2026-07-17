@@ -1,0 +1,41 @@
+[Unit]
+Description=RustGuard VPN server
+Documentation=https://github.com/omar-main/RustGuard
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=notify
+ExecStartPre=/usr/local/bin/rustguard-server --config /etc/rustguard/server.toml check
+ExecStart=/usr/local/bin/rustguard-server --config /etc/rustguard/server.toml start
+ExecStop=/usr/local/bin/rustguard-server stop
+Restart=on-failure
+RestartSec=5s
+TimeoutStopSec=15s
+RuntimeDirectory=rustguard
+RuntimeDirectoryMode=0700
+RuntimeDirectoryPreserve=yes
+UMask=0077
+
+User=root
+Group=root
+CapabilityBoundingSet=CAP_NET_ADMIN
+NoNewPrivileges=yes
+PrivateTmp=yes
+PrivateDevices=yes
+DeviceAllow=/dev/net/tun rw
+ProtectSystem=strict
+ProtectHome=yes
+ReadWritePaths=/run/rustguard
+ProtectControlGroups=yes
+ProtectKernelModules=yes
+ProtectKernelTunables=yes
+ProtectKernelLogs=yes
+LockPersonality=yes
+RestrictRealtime=yes
+RestrictSUIDSGID=yes
+RestrictAddressFamilies=AF_UNIX AF_INET AF_NETLINK
+SystemCallArchitectures=native
+
+[Install]
+WantedBy=multi-user.target
