@@ -9,7 +9,7 @@ if [[ ${EUID} -ne 0 ]]; then
     exit 1
 fi
 
-for command in ip ping wg timeout awk; do
+for command in ip ping wg timeout awk grep; do
     command -v "${command}" >/dev/null || {
         echo "error: required command '${command}' is missing" >&2
         exit 1
@@ -94,6 +94,42 @@ wait_for_link() {
     exit 1
 }
 
+wait_for_address() {
+    local namespace=$1
+    local interface=$2
+    local address=$3
+    local log=$4
+    for _ in {1..50}; do
+        if ip -n "${namespace}" -4 address show dev "${interface}" 2>/dev/null |
+            grep -Fq "inet ${address}"; then
+            return
+        fi
+        sleep 0.1
+    done
+    echo "error: ${address} was not configured on ${interface} in ${namespace}" >&2
+    ip -n "${namespace}" -4 address show dev "${interface}" >&2 || true
+    sed -n '1,160p' "${log}" >&2
+    exit 1
+}
+
+wait_for_route() {
+    local namespace=$1
+    local destination=$2
+    local interface=$3
+    local log=$4
+    for _ in {1..50}; do
+        if ip -n "${namespace}" -4 route show exact "${destination}" 2>/dev/null |
+            grep -Fq "dev ${interface}"; then
+            return
+        fi
+        sleep 0.1
+    done
+    echo "error: ${destination} was not routed through ${interface} in ${namespace}" >&2
+    ip -n "${namespace}" -4 route show >&2 || true
+    sed -n '1,160p' "${log}" >&2
+    exit 1
+}
+
 assert_ping() {
     local namespace=$1
     local destination=$2
@@ -145,6 +181,7 @@ EOF
         >"${TEST_DIR}/server-a.log" 2>&1 &
     SERVER_PID=$!
     wait_for_link "${SERVER_NS}" rg0 "${TEST_DIR}/server-a.log"
+    wait_for_address "${SERVER_NS}" rg0 10.77.0.1/24 "${TEST_DIR}/server-a.log"
 
     ip -n "${CLIENT_NS}" link add wg0 type wireguard
     ip netns exec "${CLIENT_NS}" wg set wg0 \
@@ -195,6 +232,7 @@ EOF
         >"${TEST_DIR}/client-b.log" 2>&1 &
     CLIENT_PID=$!
     wait_for_link "${CLIENT_NS}" rg0 "${TEST_DIR}/client-b.log"
+    wait_for_route "${CLIENT_NS}" 10.78.0.1/32 rg0 "${TEST_DIR}/client-b.log"
 
     assert_ping "${CLIENT_NS}" 10.78.0.1
     assert_ping "${SERVER_NS}" 10.78.0.2
@@ -236,11 +274,13 @@ EOF
         >"${TEST_DIR}/server-c.log" 2>&1 &
     SERVER_PID=$!
     wait_for_link "${SERVER_NS}" rg0 "${TEST_DIR}/server-c.log"
+    wait_for_address "${SERVER_NS}" rg0 10.79.0.1/24 "${TEST_DIR}/server-c.log"
     ip netns exec "${CLIENT_NS}" "${CLIENT_BIN}" \
         --config "${TEST_DIR}/client-c.toml" up \
         >"${TEST_DIR}/client-c.log" 2>&1 &
     CLIENT_PID=$!
     wait_for_link "${CLIENT_NS}" rg0 "${TEST_DIR}/client-c.log"
+    wait_for_route "${CLIENT_NS}" 10.79.0.1/32 rg0 "${TEST_DIR}/client-c.log"
 
     assert_ping "${CLIENT_NS}" 10.79.0.1
     assert_ping "${SERVER_NS}" 10.79.0.2
