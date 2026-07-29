@@ -56,4 +56,4 @@ base64 = "0.22"
 getrandom = "0.2"
 
 # X25519 key derivation (must match boringtun's pinned version)
-x25519-dalek = { version = "2.0.1", features = ["static_secrets"] }
+x25519-dalek = { version = "3.0.0", features = ["static_secrets"] }
