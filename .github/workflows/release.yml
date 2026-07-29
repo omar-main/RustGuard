@@ -23,7 +23,7 @@ jobs:
           command: check
       - run: cargo test --workspace --all-targets --locked
       - run: bash scripts/build_release.sh
-      - uses: actions/attest-build-provenance@v3
+      - uses: actions/attest-build-provenance@v4
         with:
           subject-path: dist/*.tar.gz
       - uses: actions/upload-artifact@v4
