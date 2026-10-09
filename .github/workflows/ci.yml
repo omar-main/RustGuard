@@ -71,7 +71,7 @@ jobs:
       - run: bash scripts/test_units.sh
       - run: bash scripts/test_release_reproducible.sh
       - run: bash scripts/build_release.sh
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         with:
           name: rustguard-0.1.0-rc.1-${{ matrix.os }}-linux-x86_64
           path: dist/*
